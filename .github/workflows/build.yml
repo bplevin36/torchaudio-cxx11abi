@@ -35,6 +35,7 @@ jobs:
           name: torchaudio-${{ matrix.torchaudio-version }}
           path: torchaudio
   build-linux:
+    needs: checkout
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,7 +59,7 @@ jobs:
       - name: Download torchaudio src
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.torchaudio-version }}
+          name: torchaudio-${{ matrix.torchaudio-version }}
           path: torchaudio
       - uses: conda-incubator/setup-miniconda@v2
         with:
