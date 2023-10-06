@@ -19,6 +19,16 @@ jobs:
             torch-version: '2.0.1'
 
     steps:
+      - name: Checkout self
+        uses: actions/checkout@v4
+      - name: Checkout torchaudio src
+        uses: actions/checkout@v4
+        with:
+          repository: pytorch/audio
+          ref: ${{ matrix.torchaudio-version }}
+      - name: Print dir
+        run: |
+          ls -R .
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: torchaudio-build
@@ -28,11 +38,6 @@ jobs:
       - name: Install torch
         run: |
           pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
-      - name: Checkout torchaudio src
-        uses: actions/checkout@v4
-        with:
-          repository: pytorch/audio
-          ref: ${{ matrix.torchaudio-version }}
       - name: Build using setuptools
         run: |
           _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
