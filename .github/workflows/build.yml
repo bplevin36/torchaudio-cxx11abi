@@ -8,7 +8,7 @@ on:
 
 jobs:
   checkout:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
         matrix:
           torchaudio-version:
@@ -36,22 +36,16 @@ jobs:
           path: torchaudio
   build-linux:
     needs: checkout
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version:
           - '3.9'
         torchaudio-version:
           - 'v2.0.2'
-        image:
-          - "quay.io/pypa/manylinux2014_x86_64"
         include:
           - torchaudio-version: 'v2.0.2'
             torch-version: '2.0.1'
-          - python_version: "3.9"
-            abi_tag: "cp39-cp39"
-    container:
-      image: ${{ matrix.image }}
     steps:
       - name: Download self
         uses: actions/download-artifact@v3
@@ -63,21 +57,21 @@ jobs:
         with:
           name: torchaudio-${{ matrix.torchaudio-version }}
           path: torchaudio
-      - name: Install ninja
-        shell: bash -el {0}
-        run: |
-          curl -L -o ninja.zip https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
-          unzip ninja.zip
-          mv ninja /usr/local/bin
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: torchaudio-build
+          environment-file: self/environment-py${{ matrix.python-version }}.yml
+          use-only-tar-bz2: true # This needs to be set for caching to work properly
+          auto-activate-base: false
       - name: Install torch
         shell: bash -el {0}
         run: |
-          /opt/python/${{ matrix.abi_tag }}/bin/pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
+          pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
       - name: Build using setuptools
         shell: bash -el {0}
         run: |
           cd torchaudio
-          _GLIBCXX_USE_CXX11_ABI=1 /opt/python/${{ matrix.abi_tag }}/bin/python setup.py bdist_wheel
+          _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
 
       - name: Upload distribution
         uses: actions/upload-artifact@v3
