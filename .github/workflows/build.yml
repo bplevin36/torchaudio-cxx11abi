@@ -36,15 +36,19 @@ jobs:
           use-only-tar-bz2: true # This needs to be set for caching to work properly
           auto-activate-base: false
       - name: Print pip
+        shell: bash -el {0}
         run: |
           pip -V
       - name: Print conda
+        shell: bash -el {0}
         run: |
           conda list
       - name: Install torch
+        shell: bash -el {0}
         run: |
           pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
       - name: Build using setuptools
+        shell: bash -el {0}
         run: |
           cd torchaudio
           _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
