@@ -7,6 +7,33 @@ on:
   workflow_call:
 
 jobs:
+ checkout:
+  runs-on: ubuntu-latest
+  strategy:
+      matrix:
+        torchaudio-version:
+          - 'v2.0.2'
+  steps:
+    - name: Checkout self
+      uses: actions/checkout@v4
+      with:
+        path: self
+    - name: Checkout torchaudio
+      uses: actions/checkout@v4
+        with:
+          repository: pytorch/audio
+          ref: ${{ matrix.torchaudio-version }}
+          path: torchaudio
+    - name: Upload self
+      uses: actions/upload-artifact@v3
+      with:
+        name: self
+        path: self
+    - name: Upload torchaudio
+      uses: actions/upload-artifact@v3
+      with:
+        name: torchaudio-${{ matrix.torchaudio-version }}
+        path: torchaudio
   build-linux:
     runs-on: ubuntu-latest
     strategy:
@@ -23,15 +50,15 @@ jobs:
     container:
       image: ${{ matrix.image }}
     steps:
-      - name: Checkout self
-        uses: actions/checkout@v4
+      - name: Download self
+        uses: actions/download-artifact@v3
         with:
+          name: self
           path: self
-      - name: Checkout torchaudio src
-        uses: actions/checkout@v4
+      - name: Download torchaudio src
+        uses: actions/download-artifact@v3
         with:
-          repository: pytorch/audio
-          ref: ${{ matrix.torchaudio-version }}
+          name: ${{ matrix.torchaudio-version }}
           path: torchaudio
       - uses: conda-incubator/setup-miniconda@v2
         with:
