@@ -63,10 +63,12 @@ jobs:
         with:
           name: torchaudio-${{ matrix.torchaudio-version }}
           path: torchaudio
-      - name: Install build tools
+      - name: Install ninja
         shell: bash -el {0}
         run: |
-          sudo apt install cmake ninja
+          curl -L -o ninja.zip https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip
+          unzip ninja.zip
+          mv ninja /usr/local/bin
       - name: Install torch
         shell: bash -el {0}
         run: |
