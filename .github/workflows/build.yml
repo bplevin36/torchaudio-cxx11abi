@@ -1,0 +1,44 @@
+name: Build wheels
+
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9']
+        torchaudio-version: ['v2.0.2']
+
+        include:
+          - torchaudio-version: 'v2.0.2'
+            torch-version: '2.0.1'
+
+    steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: torchaudio-build
+          environment-file: environment-py${{ matrix.python-version }}.yml
+          use-only-tar-bz2: true # This needs to be set for caching to work properly
+          auto-activate-base: false
+      - name: Install torch
+        run: |
+          pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
+      - name: Checkout torchaudio src
+        uses: actions/checkout@v4
+        with:
+          repository: pytorch/audio
+          ref: ${{ matrix.torchaudio-version }}
+      - name: Build using setuptools
+        run: |
+          _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
