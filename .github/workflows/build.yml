@@ -20,10 +20,10 @@ jobs:
         path: self
     - name: Checkout torchaudio
       uses: actions/checkout@v4
-        with:
-          repository: pytorch/audio
-          ref: ${{ matrix.torchaudio-version }}
-          path: torchaudio
+      with:
+        repository: pytorch/audio
+        ref: ${{ matrix.torchaudio-version }}
+        path: torchaudio
     - name: Upload self
       uses: actions/upload-artifact@v3
       with:
