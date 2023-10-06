@@ -48,6 +48,8 @@ jobs:
         include:
           - torchaudio-version: 'v2.0.2'
             torch-version: '2.0.1'
+          - python_version: "3.9"
+            abi_tag: "cp39-cp39"
     container:
       image: ${{ matrix.image }}
     steps:
@@ -61,20 +63,19 @@ jobs:
         with:
           name: torchaudio-${{ matrix.torchaudio-version }}
           path: torchaudio
-      - name: Install torch
-        shell: bash -el {0}
-        run: |
-          pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
-
       - name: Install build tools
         shell: bash -el {0}
         run: |
           sudo apt install cmake ninja
+      - name: Install torch
+        shell: bash -el {0}
+        run: |
+          /opt/python/${{ matrix.abi_tag }}/bin/pip install --only-binary torch --index-url https://download.pytorch.org/whl/cpu-cxx11-abi torch==${{ matrix.torch-version }}
       - name: Build using setuptools
         shell: bash -el {0}
         run: |
           cd torchaudio
-          _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
+          _GLIBCXX_USE_CXX11_ABI=1 /opt/python/${{ matrix.abi_tag }}/bin/python setup.py bdist_wheel
 
       - name: Upload distribution
         uses: actions/upload-artifact@v3
