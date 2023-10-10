@@ -9,10 +9,6 @@ on:
 jobs:
   checkout:
     runs-on: ubuntu-22.04
-    strategy:
-        matrix:
-          torchaudio-version:
-            - 'v2.0.2'
     steps:
       - name: Checkout self
         uses: actions/checkout@v4
@@ -31,9 +27,9 @@ jobs:
         python-version:
           - '3.9'
         torchaudio-version:
-          - 'v2.0.2'
+          - '2.0.2'
         include:
-          - torchaudio-version: 'v2.0.2'
+          - torchaudio-version: '2.0.2'
             torch-version: '2.0.1'
     steps:
       - name: Download self
@@ -45,7 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: pytorch/audio
-          ref: ${{ matrix.torchaudio-version }}
+          ref: v${{ matrix.torchaudio-version }}
           path: torchaudio
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -61,7 +57,7 @@ jobs:
         shell: bash -el {0}
         run: |
           cd torchaudio
-          _GLIBCXX_USE_CXX11_ABI=1 python setup.py bdist_wheel
+          _GLIBCXX_USE_CXX11_ABI=1 BUILD_VERSION=${{ matrix.torchaudio-version }} python setup.py bdist_wheel
 
       - name: Upload distribution
         uses: actions/upload-artifact@v3
