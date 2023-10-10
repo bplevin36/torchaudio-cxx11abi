@@ -28,3 +28,6 @@ jobs:
       run: ls -R dist
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1.8
+      with:
+        verbose: true
+        verify-metadata: false  # twine bug causing issues so disable
