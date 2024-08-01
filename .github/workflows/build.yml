@@ -65,5 +65,5 @@ jobs:
       - name: Upload distribution
         uses: actions/upload-artifact@v4
         with:
-          name: dist-{{ matrix.torchaudio-version }}
+          name: dist-${{ matrix.torchaudio-version }}
           path: torchaudio/dist/
