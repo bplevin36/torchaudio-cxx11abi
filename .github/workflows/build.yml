@@ -8,7 +8,7 @@ on:
 
 jobs:
   checkout:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout self
         uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
           path: self
   build-linux:
     needs: checkout
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version:
@@ -65,5 +65,5 @@ jobs:
       - name: Upload distribution
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-{{ matrix.torchaudio-version }}
           path: torchaudio/dist/
